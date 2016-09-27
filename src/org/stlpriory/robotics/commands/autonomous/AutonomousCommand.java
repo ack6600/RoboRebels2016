@@ -1,36 +1,57 @@
 package org.stlpriory.robotics.commands.autonomous;
 
-import org.stlpriory.robotics.commands.ElevatorStop;
-import org.stlpriory.robotics.commands.ElevatorUp;
-import org.stlpriory.robotics.commands.drivetrain.DriveForward;
+import org.stlpriory.robotics.Robot;
 import org.stlpriory.robotics.commands.drivetrain.Rotate;
-import org.stlpriory.robotics.commands.drivetrain.ShiftHigh;
+import org.stlpriory.robotics.subsystems.DrivetrainSubsystem.Direction;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
-import edu.wpi.first.wpilibj.command.WaitCommand;
 
 /**
  *
  */
 public class AutonomousCommand extends CommandGroup {
+    public enum Obstacle {
+        OPPOSING_RAMPS(1),
+        MOVABLE_RAMPS(2),
+        ROUGH_TERRAIN(3),
+        LOW_BAR(4),
+        PORTCULLIS(5),
+        MOAT(6),
+        DRAWBRIDGE(7),
+        SALLYPORT(8),
+        ROCK_WALL(9);
+        private int number;
 
-	public  AutonomousCommand() {
-		// Add Commands here:
-        // e.g. addSequential(new Command1());
-        //      addSequential(new Command2());
-        // these will run in order.
+        Obstacle(int number) {
+            this.number = number;
+        }
 
-        // To run multiple commands at the same time,
-        // use addParallel()
-        // e.g. addParallel(new Command1());
-        //      addSequential(new Command2());
-        // Command1 and Command2 will run in parallel.
+        public int getNumber() {
+            return this.number;
+        }
 
-        // A command group will require all of the subsystems that each member
-        // would require.
-        // e.g. if Command1 requires chassis, and Command2 requires arm,
-        // a CommandGroup containing them would require both
-    	//the chassis and the
-        // arm.
-	}
+        public static Obstacle getObstacle(int number) {
+            for (Obstacle o : Obstacle.values()) {
+                if (o.getNumber() == number)
+                    return o;
+            }
+            return null;
+        }
+    }
+
+    private double gyroReading;
+
+    public AutonomousCommand() {
+        System.out.println(String.format("Set gyro angle for autonomous; it's %f", gyroReading));
+        // This code never worked, but I wanted it to.
+        addSequential(new SetAutonomousInfo());
+        addSequential(new DriveDistance(5, Direction.FORWARD, Robot.autonomousInfo, 0, true));
+//        addSequential(new Rotate(180));
+//        addSequential(new DriveDistance(3, Direction.FORWARD, Robot.autonomousInfo, 180, true));
+
+
+        // This was the working autonomous code at the end of last season.
+        // Fascinating, I know.
+        // addSequential(new DriveDistance(11, Direction.FORWARD));
+    }
 }

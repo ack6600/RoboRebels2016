@@ -1,43 +1,51 @@
-package org.stlpriory.robotics.commands.drivetrain;
+package org.stlpriory.robotics.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import org.stlpriory.robotics.Robot;
+import org.stlpriory.robotics.subsystems.BallHolderSubsystem;
+import org.stlpriory.robotics.subsystems.BallHolderSubsystem.Direction;
 
 /**
  *
  */
-public class DriveWithGamepad extends Command {
+public class BallHolderUp extends Command {
+    private boolean forceable;
 
-    public DriveWithGamepad() {
-        super("DriveWithGamepad");
-        requires(Robot.drivetrain);
+    public BallHolderUp(boolean forceable) {
+        // Use requires() here to declare subsystem dependencies
+        requires(Robot.ballHolder);
+        this.forceable = forceable;
     }
 
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
+
     }
 
     // Called repeatedly when this Command is scheduled to run
     @Override
     protected void execute() {
-        Robot.drivetrain.controllerDrive(Robot.oi.getController());
+        if (!isFinished())
+            Robot.ballHolder.set(Direction.UP, BallHolderSubsystem.ARM_SPEED);
     }
 
     // Make this return true when this Command no longer needs to run execute()
     @Override
     protected boolean isFinished() {
-        return false;
+        return !Robot.ballHolder.canGoHigher() && !(Robot.oi.forceButton.get() && forceable);
     }
 
     // Called once after isFinished returns true
     @Override
     protected void end() {
+        Robot.ballHolder.stop();
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     @Override
     protected void interrupted() {
+        Robot.ballHolder.stop();
     }
 }

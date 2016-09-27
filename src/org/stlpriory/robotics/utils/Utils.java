@@ -3,28 +3,36 @@
  * and open the template in the editor.
  */
 package org.stlpriory.robotics.utils;
-import org.stlpriory.robotics.utils.Constants;
+
+import edu.wpi.first.wpilibj.CANTalon;
 
 /**
  * Utility class
  */
 public class Utils {
-    
+    // conversion factor from feet to 'TALON' units
+    // TODO: This needs to be set properly again
+    public static final double TALON_UNIT = 745.6;
     // Threshold below which joystick inputs will be ignored
     public static final double JOYSTICK_THRESHOLD = 0.2;
 
     /**
      * Rounds a double to specified number of decimal places.
      *
-     * @param x The input number that needs to be rounded.
+     * @param x        The input number that needs to be rounded.
      * @param decimals The number of decimal places.
      * @return The input number rounded to the number of decimal places
      * specified.
      */
-    public static double TALONdistance(double feet){
-    	double TALON = feet * (Constants.TALON_UNIT);
-    	return TALON;
+    public static double TALONdistance(double feet) {
+        double TALON = feet * (TALON_UNIT);
+        return TALON;
     }
+
+    public static double getCANTalonTemp(CANTalon talon) {
+        return talon.getTemperature();
+    }
+
     public static double roundDecimals(double x, int decimals) {
         if (decimals > 9) {
             return (Math.ceil(x * decimals) / decimals);
@@ -51,7 +59,7 @@ public class Utils {
      * Scale a number between two specified numbers. eg. Scale 0.6 between 0.3
      * and 0.7
      *
-     * @param x The number to be scaled
+     * @param x   The number to be scaled
      * @param min Minimum value
      * @param max Maximum value
      * @return Scaled value between min and max
@@ -88,5 +96,5 @@ public class Utils {
         }
         return 0;
     }
-    
+
 }
