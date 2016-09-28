@@ -100,24 +100,25 @@ public class DrivetrainSubsystem extends Subsystem {
         // This sums the triggers and the sticks appropriately so that they might
         // maybe work in a very natural-feeling way. I tried to make it so that it 
         // would also use the gyro if possible. We'll see how it works. 
-        double rightValue = 0;
-        double leftValue = 0;
-        double leftStickValue = Utils.scale(joystick.getRawAxis(OI.LEFT_STICK_Y_AXIS));
-        double rightStickValue = Utils.scale(joystick.getRawAxis(OI.RIGHT_STICK_Y_AXIS));
-        double rightTrigger = joystick.getRawAxis(OI.RIGHT_TRIGGER);
-        double leftTrigger = joystick.getRawAxis(OI.LEFT_TRIGGER);
-        rightValue -= rightTrigger;
-        leftValue -= rightTrigger;
-        rightValue += leftTrigger;
-        leftValue += leftTrigger;
-        rightValue += rightStickValue;
-        leftValue += leftStickValue;
-        if (leftStickValue == 0 && rightStickValue == 0 && (leftTrigger > .05 || rightTrigger > .05)) {
-            driveForward(rightValue, lastAngle);
-        } else {
-            lastAngle = getAngle();
-            tankDrive(leftValue, rightValue);
-        }
+//        double rightValue = 0;
+//        double leftValue = 0;
+//        double leftStickValue = Utils.scale(joystick.getRawAxis(OI.LEFT_STICK_Y_AXIS));
+//        double rightStickValue = Utils.scale(joystick.getRawAxis(OI.RIGHT_STICK_Y_AXIS));
+//        double rightTrigger = joystick.getRawAxis(OI.RIGHT_TRIGGER);
+//        double leftTrigger = joystick.getRawAxis(OI.LEFT_TRIGGER);
+//        rightValue -= rightTrigger;
+//        leftValue -= rightTrigger;
+//        rightValue += leftTrigger;
+//        leftValue += leftTrigger;
+//        rightValue += rightStickValue;
+//        leftValue += leftStickValue;
+//        if (leftStickValue == 0 && rightStickValue == 0 && (leftTrigger > .05 || rightTrigger > .05)) {
+//            driveForward(rightValue, lastAngle);
+//        } else {
+//            lastAngle = getAngle();
+//            tankDrive(leftValue, rightValue);
+//        }
+        this.driveSingleStick(joystick);
     }
 
     public void arcadeDrive(double speed, double rotation) {
@@ -148,6 +149,15 @@ public class DrivetrainSubsystem extends Subsystem {
         // I stole this from the internet too.
         final double kP = .01;
         arcadeDrive(speed, (desiredHeading - getAngle()) * kP);
+    }
+    public void driveSingleStick(Joystick joystick){
+        double x = joystick.getRawAxis(OI.RIGHT_STICK_X_AXIS);
+        double y = joystick.getRawAxis(OI.RIGHT_STICK_Y_AXIS);
+        double degree = Math.atan2(y,x);
+        double speed = Math.sqrt((x * x) + (y * y));
+        if(degree < 0)
+            degree += 360;
+        driveForward(speed,degree);
     }
 
     public void driveForward(double speed) {
