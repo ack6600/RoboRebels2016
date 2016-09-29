@@ -100,25 +100,25 @@ public class DrivetrainSubsystem extends Subsystem {
         // This sums the triggers and the sticks appropriately so that they might
         // maybe work in a very natural-feeling way. I tried to make it so that it 
         // would also use the gyro if possible. We'll see how it works. 
-//        double rightValue = 0;
-//        double leftValue = 0;
-//        double leftStickValue = Utils.scale(joystick.getRawAxis(OI.LEFT_STICK_Y_AXIS));
-//        double rightStickValue = Utils.scale(joystick.getRawAxis(OI.RIGHT_STICK_Y_AXIS));
-//        double rightTrigger = joystick.getRawAxis(OI.RIGHT_TRIGGER);
-//        double leftTrigger = joystick.getRawAxis(OI.LEFT_TRIGGER);
-//        rightValue -= rightTrigger;
-//        leftValue -= rightTrigger;
-//        rightValue += leftTrigger;
-//        leftValue += leftTrigger;
-//        rightValue += rightStickValue;
-//        leftValue += leftStickValue;
-//        if (leftStickValue == 0 && rightStickValue == 0 && (leftTrigger > .05 || rightTrigger > .05)) {
-//            driveForward(rightValue, lastAngle);
-//        } else {
-//            lastAngle = getAngle();
-//            tankDrive(leftValue, rightValue);
-//        }
-        this.driveSingleStick(joystick);
+        double rightValue = 0;
+        double leftValue = 0;
+        double leftStickValue = Utils.scale(joystick.getRawAxis(OI.LEFT_STICK_Y_AXIS));
+        double rightStickValue = Utils.scale(joystick.getRawAxis(OI.RIGHT_STICK_Y_AXIS));
+        double rightTrigger = joystick.getRawAxis(OI.RIGHT_TRIGGER);
+        double leftTrigger = joystick.getRawAxis(OI.LEFT_TRIGGER);
+        rightValue -= rightTrigger;
+        leftValue -= rightTrigger;
+        rightValue += leftTrigger;
+        leftValue += leftTrigger;
+        rightValue += rightStickValue;
+        leftValue += leftStickValue;
+        if (leftStickValue == 0 && rightStickValue == 0 && (leftTrigger > .05 || rightTrigger > .05)) {
+            driveForward(rightValue, lastAngle);
+        } else {
+            lastAngle = getAngle();
+            tankDrive(leftValue, rightValue);
+        }
+
     }
 
     public void arcadeDrive(double speed, double rotation) {
@@ -133,13 +133,21 @@ public class DrivetrainSubsystem extends Subsystem {
                 leftMotorSpeed = Math.max(speed, -rotation);
                 rightMotorSpeed = speed + rotation;
             }
-        } else {
+        } else if (speed < 0.0){
             if (rotation > 0.0) {
                 leftMotorSpeed = -Math.max(-speed, rotation);
                 rightMotorSpeed = speed + rotation;
             } else {
                 leftMotorSpeed = speed - rotation;
                 rightMotorSpeed = -Math.max(-speed, -rotation);
+            }
+        } else{ //speed = 0, zero turn
+            if(rotation > 0.0){
+                leftMotorSpeed = rotation;
+                rightMotorSpeed = -rotation;
+            } else{
+                leftMotorSpeed = -rotation;
+                rightMotorSpeed = rotation;
             }
         }
         tankDrive(leftMotorSpeed, rightMotorSpeed);
@@ -156,7 +164,9 @@ public class DrivetrainSubsystem extends Subsystem {
         double degree = Math.atan2(y,x);
         double speed = Math.sqrt((x * x) + (y * y));
         if(degree < 0)
-            degree += 360;
+            degree += 360.0;
+        if(!(Math.abs(degree - this.getAngle()) <= GYRO_TOLERANCE))
+            speed = 0.0;
         driveForward(speed,degree);
     }
 
